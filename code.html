@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>У меня есть вопрос...</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Comfortaa', cursive, sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #ffdde1 0%, #ee9ca7 100%);
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    .card {
+      background: #ffffff;
+      padding: 40px 30px;
+      border-radius: 24px;
+      box-shadow: 0 15px 35px rgba(238, 156, 167, 0.3);
+      text-align: center;
+      max-width: 420px;
+      width: 100%;
+      position: relative;
+    }
+
+    h1 {
+      color: #4a4a4a;
+      font-size: 22px;
+      margin-bottom: 30px;
+      line-height: 1.4;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      min-height: 60px;
+      position: relative;
+    }
+
+    button {
+      background-color: #ff6b81;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(255, 107, 129, 0.3);
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #ff4757;
+    }
+
+    /* Кнопка НЕТ с плавной анимацией */
+    #noBtn {
+      background-color: #f1f2f6;
+      color: #747d8c;
+      box-shadow: none;
+      position: relative;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Вторая страница (выбор места) */
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .opt-btn {
+      width: 100%;
+      background-color: #fff0f3;
+      color: #ff4757;
+      border: 2px solid #ffccd5;
+      box-shadow: none;
+    }
+
+    .opt-btn:hover {
+      background-color: #ff6b81;
+      color: white;
+      border-color: #ff6b81;
+    }
+
+    /* Плавная анимация появления страниц */
+    .step {
+      display: none;
+    }
+
+    .step.active {
+      display: block;
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    
+    <!-- Шаг 1: Вопрос -->
+    <div id="step1" class="step active">
+      <h1>Ты пойдешь со мной на свиданье? 💕</h1>
+      <div class="btn-group">
+        <button id="yesBtn" onclick="goToStep2()">Да!</button>
+        <button id="noBtn" onclick="moveNoButton()">Нет</button>
+      </div>
+    </div>
+
+    <!-- Шаг 2: Выбор места -->
+    <div id="step2" class="step">
+      <h1>Отлично, выбери куда ты хочешь сходить? ✨</h1>
+      <div class="options-grid">
+        <button class="opt-btn" onclick="makeChoice('Парк аттракционов 🎡')">Парк аттракционов 🎡</button>
+        <button class="opt-btn" onclick="makeChoice('Ресторан 🍷')">Ресторан 🍷</button>
+        <button class="opt-btn" onclick="makeChoice('Кино 🎬')">Кино 🎬</button>
+        <button class="opt-btn" onclick="makeChoice('Просто погулять 🌳')">Просто погулять 🌳</button>
+      </div>
+    </div>
+
+    <!-- Шаг 3: Финал -->
+    <div id="step3" class="step">
+      <h1>Когда я приеду, мы проведем этот день шикарно! ❤️</h1>
+    </div>
+
+  </div>
+
+  <script>
+    // =========================================================
+    // НАСТРОЙКА УВЕДОМЛЕНИЙ В TELEGRAM
+    // Вставьте сюда ваш Token и Chat ID
+    // =========================================================
+    const TELEGRAM_BOT_TOKEN = '8623032798:AAEFJ0JN492HrA7u9jaabwTpkxgzqXLRC-Y';
+    const TELEGRAM_CHAT_ID = '1827818074';
+
+    // Переменные для отслеживания текущих координат и размера кнопки "Нет"
+    let noScale = 1.0;
+    let currentX = 0;
+    let currentY = 0;
+
+    // Функция прыжка кнопки "Нет" строго на 3.5 см (132px) и уменьшения на 0.7x
+    function moveNoButton() {
+      const noBtn = document.getElementById('noBtn');
+      
+      // 3.5 см на стандартных экранах = ~132 пикселей
+      const distance = 132; 
+
+      // Генерируем случайный угол для перемещения
+      const angle = Math.random() * 2 * Math.PI;
+
+      // Рассчитываем новые координаты
+      currentX += Math.cos(angle) * distance;
+      currentY += Math.sin(angle) * distance;
+
+      // Уменьшаем размер на 0.7x от текущего
+      noScale *= 0.7;
+
+      // Применяем плавно перемещение и масштабирование
+      noBtn.style.transform = `translate(${currentX}px, ${currentY}px) scale(${noScale})`;
+    }
+
+    // Переход ко 2 шагу
+    function goToStep2() {
+      document.getElementById('step1').classList.remove('active');
+      document.getElementById('step2').classList.add('active');
+    }
+
+    // Выбор места и отправка уведомления
+    function makeChoice(choice) {
+      // Переходим к финальному экрану
+      document.getElementById('step2').classList.remove('active');
+      document.getElementById('step3').classList.add('active');
+
+      // Отправляем выбор вам в Telegram
+      sendNotification(choice);
+    }
+
+    // Отправка сообщения через Telegram API
+    function sendNotification(choiceText) {
+      if (TELEGRAM_BOT_TOKEN === 'ВАШ_BOT_TOKEN' || !TELEGRAM_BOT_TOKEN) {
+        console.log('Бот не настроен. Выбран пункт:', choiceText);
+        return;
+      }
+
+      const message = `🎉 Она согласилась пойти на свидание!\n\nВыбранный вариант: *${choiceText}*`;
+      const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: message,
+          parse_mode: 'Markdown'
+        })
+      }).catch(err => console.error('Ошибка отправки:', err));
+    }
+  </script>
+</body>
+</html>
